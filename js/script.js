@@ -5,7 +5,6 @@ var buttonEl = $("#search-button");
 var historyEl = $("#history");
 var clearEl = $("#clear-button");
 
-// http://api.openweathermap.org/geo/1.0/direct?q={city name},{country code}&limit=1&appid=7cecd6cf1a25249cb6676d7e0009bd81
 
 // FUNCTION 1 
 // build Geo Query URL using input from form
@@ -21,9 +20,10 @@ function buildGeoQueryURL() {
 // use URL to submit API request
 function apiRequest1() {
   var geoQueryURL = weatherMap + city + apiKey;
-  loadJSON(geoQueryURL,gotData)
+  loadJSON(geoQueryURL)
   console.log(geoQueryURL);
 }
+// WHY DOESN'T THIS LOG OUT!!!!!
 
 
 // fetch(`http://api.openweathermap.org/geo/1.0/direct?q=` + inputEl + `&limit=1&appid=7cecd6cf1a25249cb6676d7e0009bd81`)
