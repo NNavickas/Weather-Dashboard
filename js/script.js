@@ -62,9 +62,6 @@ function getCurrentLocation(position) {
   $.getJSON("http://api.openweathermap.org/data/2.5/forecast?lat=" + latitude + "&lon=" + longitude + "&appid=7cecd6cf1a25249cb6676d7e0009bd81&units=metric", function (data) {
       console.log(data);
       console.log(weather.main.temp);
-      $("#search-input").append(inputEl + " ");
-      $(".temperature").append(temp + " ");
-      $(".weatherdescription").append(field + " ");
   })
 
 };
