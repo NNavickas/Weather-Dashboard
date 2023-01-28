@@ -1,20 +1,79 @@
-// declare jQuery variable for search form
+// declare jQuery variables
 var searchEl = $("#search-form");
-
-// declare jQuery variable for search input
 var inputEl = $("#search-input");
-
-// declare jQuery variable for search button
 var buttonEl = $("#search-button");
-
-// declare jQuery variable for list group
 var historyEl = $("#history");
+var clearEl = $("#clear-button");
+
+// http://api.openweathermap.org/geo/1.0/direct?q={city name},{country code}&limit=1&appid=7cecd6cf1a25249cb6676d7e0009bd81
+
+// build Geo Query URL using input from form
+function buildGeoQueryURL(event) {
+  // queryURL is the url we'll use to query the API
+  var queryURL = "http://api.openweathermap.org/geo/1.0/direct?q=" + inputEl + "&limit=1&appid=7cecd6cf1a25249cb6676d7e0009bd81";
+  console.log(queryURL);
+  event.preventDefault();
+}
+
+// build Final Query URL using input from form
+function buildFinalQueryURL(event) {
+  // FinalQueryURL is the url we'll use to query the API
+  const lat = data.coord.lat;
+  const lon = data.coord.lon;
+  var finalQueryURL = "http://api.openweathermap.org/data/2.5/forecast?lat=" + lat + "&lon=" + lon + "&appid=7cecd6cf1a25249cb6676d7e0009bd81";
+  console.log(finalQueryURL);
+  event.preventDefault();
+}
+
+// clear function
+function clear() {
+  $("#history").empty();
+}
+
+// CLICK EVENTS
+// submit form
+$("#search-button").on("click", function(event) {
+  event.preventDefault();
+  clear;
+  var queryURL = buildFinalQueryURL();
+  $.ajax({
+    url: queryURL,
+    method: "GET"
+  }).then(updatePage);
+});
+
+// clear history
+$("#clear-button").on("click", clear);
+
+
+// declare variable to handle form submit
+// include a prevent default
+// var handleFormSubmit = function (event) {
+//   event.preventDefault();
+
+
+  // event listener for the search button click
+
+  // API request to use the city entered before 'click' as the search term
+// };
+
+
+// fetch(`http://api.openweathermap.org/geo/1.0/direct?q=London&limit=5&appid={API_KEY}`)
+//   .then(response => response.json())
+//   .then(data => {
+//     const lat = data.coord.lat;
+//     const lon = data.coord.lon;
+//     fetch(`http://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid={API_KEY}`)
+//       .then(response => response.json())
+//       .then(forecastData => {
+//         // do something with the forecast data
+//       });
+//   });
 
 // create the history list
-// var printSkills = function (name, date) {
-function printSkills(name, date) {
+function printHistory(previous) {
   var listEl = $("<li>");
-  var listDetail = name.concat(" on ", date);
+  var listDetail = previous
   listEl.addClass("list-group-item").text(listDetail);
   listEl.appendTo(historyEl);
 
@@ -24,12 +83,5 @@ function printSkills(name, date) {
 function nextFunction() {
     
 }
-// declare variable to handle form submit
-// include a prevent default
-var handleFormSubmit = function (event) {
-  event.preventDefault();
 
-  // event listener for the search button click
 
-  // API request to use the city entered before click as the search term
-};
