@@ -7,23 +7,33 @@ var clearEl = $("#clear-button");
 
 // http://api.openweathermap.org/geo/1.0/direct?q={city name},{country code}&limit=1&appid=7cecd6cf1a25249cb6676d7e0009bd81
 
+// FUNCTION 1 
 // build Geo Query URL using input from form
-function buildGeoQueryURL(event) {
-//   // queryURL is the url we'll use to query the API
-//   var queryURL = "http://api.openweathermap.org/geo/1.0/direct?q=" + inputEl + "&limit=1&appid=7cecd6cf1a25249cb6676d7e0009bd81";
-//   console.log(queryURL);
-//   event.preventDefault();
-// }
+function buildGeoQueryURL() {
+  // start of URL, always the same
+  const weatherMap = "http://api.openweathermap.org/geo/1.0/direct?q="
+  // user input to change city in URL
+  var city = $("#search-input");
+  // suffix of URL incl API key, always the same
+  const apiKey = "&limit=5&appid=7cecd6cf1a25249cb6676d7e0009bd81"
 
-fetch(`http://api.openweathermap.org/geo/1.0/direct?q=${inputEl}&limit=1&appid=7cecd6cf1a25249cb6676d7e0009bd81`)
-  .then(response => response.json())
-  .then(data => {
-    const lat = data.coord.lat;
-    const lon = data.coord.lon;
-    buildFinalQueryURL(lat, lon);
-  });
-event.preventDefault();
+//FUNCTION 2 
+// use URL to submit API request
+function apiRequest1() {
+  var geoQueryURL = weatherMap + city + apiKey;
+  loadJSON(geoQueryURL,gotData)
+  console.log(geoQueryURL);
 }
+
+
+// fetch(`http://api.openweathermap.org/geo/1.0/direct?q=` + inputEl + `&limit=1&appid=7cecd6cf1a25249cb6676d7e0009bd81`)
+//   .then(response => response.json())
+//   .then(data => {
+//     const lat = data.coord.lat;
+//     const lon = data.coord.lon;
+//     buildFinalQueryURL(lat, lon);
+//   });
+// }
 
 // build Final Query URL using input from form
 // function buildFinalQueryURL(event) {
@@ -38,6 +48,26 @@ function buildFinalQueryURL(lat, lon) {
   var finalQueryURL = "http://api.openweathermap.org/data/2.5/forecast?lat=" + lat + "&lon=" + lon + "&appid=7cecd6cf1a25249cb6676d7e0009bd81";
   console.log(finalQueryURL);
 }
+
+// FUNCTION 
+// Update the page with the data
+function getCurrentLocation(position) {
+
+  const latitude = position.coords.latitude;
+  const longitude = position.coords.longitude;
+
+  console.log(latitude);
+  console.log(longitude);
+
+  $.getJSON("http://api.openweathermap.org/data/2.5/forecast?lat=" + latitude + "&lon=" + longitude + "&appid=7cecd6cf1a25249cb6676d7e0009bd81&units=metric", function (data) {
+      console.log(data);
+      console.log(weather.main.temp);
+      $("#search-input").append(inputEl + " ");
+      $(".temperature").append(temp + " ");
+      $(".weatherdescription").append(field + " ");
+  })
+
+};
 
 // Update page function 
 
@@ -56,7 +86,8 @@ $("#search-button").on("click", function(event) {
   $.ajax({
     url: queryURL,
     method: "GET"
-  }).then(updatePage);
+  })
+  //.then(updatePage);
 });
 
 // clear history
@@ -99,6 +130,4 @@ function printHistory(previous) {
 
 function nextFunction() {
     
-}
-
-
+}}
