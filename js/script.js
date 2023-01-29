@@ -6,25 +6,62 @@ var historyEl = $("#history");
 var clearEl = $("#clear-button");
 
 
-// FUNCTION 1 
-// build Geo Query URL using input from form
-function buildGeoQueryURL() {
-  // start of URL, always the same
-  const weatherMap = "http://api.openweathermap.org/geo/1.0/direct?q="
-  // user input to change city in URL
-  var city = $("#search-input");
-  // suffix of URL incl API key, always the same
-  const apiKey = "&limit=5&appid=7cecd6cf1a25249cb6676d7e0009bd81"
+// API endpoint for geocoding
+const geocodeApiEndpoint = "https://api.openweathermap.org/geo/1.0/direct?";
 
-//FUNCTION 2 
-// use URL to submit API request
-function apiRequest1() {
-  var geoQueryURL = weatherMap + city + apiKey;
-  loadJSON(geoQueryURL)
-  console.log(geoQueryURL);
-}
-// WHY DOESN'T THIS LOG OUT!!!!!
+// API endpoint for 5-day forecast
+const forecastApiEndpoint = "https://api.openweathermap.org/data/2.5/forecast?";
 
+// API key
+const apiKey = "7cecd6cf1a25249cb6676d7e0009bd81";
+
+// Units (imperial or metric)
+const units = "metric";
+
+$("#search-button").on("click", function(event) {
+  event.preventDefault();
+  // Get the city value from the input box
+  const city = $("#search-input").val();
+
+  // Build the API query URL for geocoding
+  const geocodeQueryURL = geocodeApiEndpoint + "q=" + city + "&limit=1&appid=" + apiKey;
+
+  // Make the AJAX request for geocoding
+  $.ajax({
+    url: geocodeQueryURL,
+    type: "GET",
+    success: function(geocodeData) {
+      // Get the latitude and longitude from the geocodeData
+      const lat = geocodeData[0].lat;
+      const lon = geocodeData[0].lon;
+
+      console.log(geocodeQueryURL);
+      
+      // Build the API query URL for 5-day forecast
+      const forecastQueryURL = forecastApiEndpoint + "lat=" + lat + "&lon=" + lon + "&units=" + units + "&appid=" + apiKey;
+
+
+      // Make the AJAX request for 5-day forecast
+      $.ajax({
+        url: forecastQueryURL,
+        type: "GET",
+        success: function(forecastData) {
+          console.log(forecastData);
+          console.log(forecastQueryURL);
+        },
+        error: function(error) {
+          console.error("Error getting 5-day forecast: ", error);
+        }
+      });
+    },
+    error: function(error) {
+      console.error("Error getting geocode data: ", error);
+    }
+  });
+});
+
+
+//   const apiKey = "&limit=1&appid=7cecd6cf1a25249cb6676d7e0009bd81";
 
 // fetch(`http://api.openweathermap.org/geo/1.0/direct?q=` + inputEl + `&limit=1&appid=7cecd6cf1a25249cb6676d7e0009bd81`)
 //   .then(response => response.json())
@@ -35,60 +72,62 @@ function apiRequest1() {
 //   });
 // }
 
-// build Final Query URL using input from form
+//build Final Query URL using input from form
 // function buildFinalQueryURL(event) {
+//   event.preventDefault();
 //   // FinalQueryURL is the url we'll use to query the API
 //   const lat = data.coord.lat;
 //   const lon = data.coord.lon;
 //   var finalQueryURL = "http://api.openweathermap.org/data/2.5/forecast?lat=" + lat + "&lon=" + lon + "&appid=7cecd6cf1a25249cb6676d7e0009bd81";
 //   console.log(finalQueryURL);
-//   event.preventDefault();
+//  }
+// function buildFinalQueryURL(lat, lon) {
+//   var finalQueryURL = "http://api.openweathermap.org/data/2.5/forecast?lat=" + lat + "&lon=" + lon + "&appid=7cecd6cf1a25249cb6676d7e0009bd81";
+//   console.log(finalQueryURL);
 // }
-function buildFinalQueryURL(lat, lon) {
-  var finalQueryURL = "http://api.openweathermap.org/data/2.5/forecast?lat=" + lat + "&lon=" + lon + "&appid=7cecd6cf1a25249cb6676d7e0009bd81";
-  console.log(finalQueryURL);
-}
 
 // FUNCTION 
-// Update the page with the data
-function getCurrentLocation(position) {
+// // Update the page with the data
+// function getCurrentLocation(position) {
 
-  const latitude = position.coords.latitude;
-  const longitude = position.coords.longitude;
+//   const latitude = position.coords.latitude;
+//   const longitude = position.coords.longitude;
 
-  console.log(latitude);
-  console.log(longitude);
+//   console.log(latitude);
+//   console.log(longitude);
 
-  $.getJSON("http://api.openweathermap.org/data/2.5/forecast?lat=" + latitude + "&lon=" + longitude + "&appid=7cecd6cf1a25249cb6676d7e0009bd81&units=metric", function (data) {
-      console.log(data);
-      console.log(weather.main.temp);
-  })
+//   $.getJSON("http://api.openweathermap.org/data/2.5/forecast?lat=" + latitude + "&lon=" + longitude + "&appid=7cecd6cf1a25249cb6676d7e0009bd81&units=metric", function (data) {
+//       console.log(data);
+//       console.log(weather.main.temp);
+//   })
 
-};
+// };
 
 // Update page function 
 
 
-// clear function
-function clear() {
-  $("#history").empty();
-}
+// // clear function
+// function clear() {
+//   $("#history").empty();
+// }
 
 // CLICK EVENTS
 // submit form
-$("#search-button").on("click", function(event) {
-  event.preventDefault();
-  clear;
-  var queryURL = buildFinalQueryURL();
-  $.ajax({
-    url: queryURL,
-    method: "GET"
-  })
-  //.then(updatePage);
-});
+// $("#search-button").on("click", function(event) {
+//   event.preventDefault();
+//   clear;
+//   var queryURL = buildQueryURL();
+//   $.ajax({
+//     url: queryURL,
+//     method: "GET"
+//   })
+//   //.then(updatePage);
+// });
 
-// clear history
-$("#clear-button").on("click", clear);
+// // clear history
+// $("#clear-button").on("click", clear);
+
+
 
 
 // declare variable to handle form submit
@@ -112,19 +151,20 @@ $("#clear-button").on("click", clear);
 //       .then(response => response.json())
 //       .then(forecastData => {
 //         // do something with the forecast data
-//       });
-//   });
+// //       });
+// //   });
 
-// create the history list
-function printHistory(previous) {
-  var listEl = $("<li>");
-  var listDetail = previous
-  listEl.addClass("list-group-item").text(listDetail);
-  listEl.appendTo(historyEl);
+// // create the history list
+// // push onto an array?
+// function printHistory(previous) {
+//   var listEl = $("<li>");
+//   var listDetail = previous
+//   listEl.addClass("list-group-item").text(listDetail);
+//   listEl.appendTo(historyEl);
 
-  nextFunction()
-}
+//   nextFunction()
+// }
 
-function nextFunction() {
+// function nextFunction() {
     
-}}
+// }
