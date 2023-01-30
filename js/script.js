@@ -35,7 +35,7 @@ $("#search-button").on("click", function (event) {
       const lat = geocodeData[0].lat;
       const lon = geocodeData[0].lon;
 
-      console.log(geocodeQueryURL);
+      console.log("---------------\ngeocodeQueryURL: " + geocodeQueryURL + "\n---------------");
 
       // Build the API query URL for 5-day forecast
       const forecastQueryURL =
@@ -43,7 +43,7 @@ $("#search-button").on("click", function (event) {
         "lat=" + lat +
         "&lon=" + lon +
         "&units=" + units +
-        "&appid=" +apiKey;
+        "&appid=" + apiKey;
 
       // Make the AJAX request for 5-day forecast
       $.ajax({
@@ -51,7 +51,7 @@ $("#search-button").on("click", function (event) {
         type: "GET",
         success: function (forecastData) {
           console.log(forecastData);
-          console.log(forecastQueryURL);
+          console.log("---------------\nforecastQueryURL: " + forecastQueryURL + "\n---------------");
         },
         error: function (error) {
           console.error("Error getting 5-day forecast: ", error);
@@ -64,37 +64,78 @@ $("#search-button").on("click", function (event) {
   });
 });
 
-// function to render the searched city current weather
-function displayCurrentCity() {
+/** 
+* @param {object} forecastData - object containing JSON output
+*/
 
-$.ajax({
-  url: forecastQueryURL,
-  method: "GET"
-}).then(function(forecastData) {
-  // Get the city name from the API response
-  var city = forecastData.list.city.name;
+//declare how mnay days forecast needed
+const forecastLength = 5;
+ // Loop through and build elements for the defined number of days
+ for (var i = 0; i < forecastLength; i++) {
+  // Get specific forecast info for current index
+  var temp = forecastData.list[i].main.temp;
+  var wind = forecastData.list[i].wind.speed;
+  var icon = forecastData.list[i].weather.icon;
+  var humidity = forecastData.list[i].main.humidity;
+
+  // Increase the forecastDay (track day # - starting at 1)
+  var forecastDay = i + 1;
+
+     // Create the  list group to contain the forecast and add the content for each day
+     var $forecastDetail = $("<ul>");
+     $forecastDetail.addClass("list-group");
+ }
+
+
+// function splitData(city, list) {
   
-  // Get the current date
-  var currentDate = new Date();
+// }
+
+// fetch("https://api.openweathermap.org/data/2.5/forecast?q='+city.value+'lat='+lat+'&lon='+lon+'&units='+units+'&appid=7cecd6cf1a25249cb6676d7e0009bd81")
+// .then(response => response.json())
+// .then(data => {
+//   for (i=0; i<5; i++){
+//     document.getElementById("TempDay" + (i+1) + "temp").innerHTML = 
+//     "Temp:" + Number(data.list[i].main.temp + "°C");
+
+//   }
+// })
+
+// // function to render the searched city current weather
+// function displayCurrentCity() {
+
+// $.ajax({
+//   url: forecastQueryURL,
+//   method: "GET"
+// }).then(function(forecastData) {
+//   // Get the city name from the API response
+//   var city = data.city.name;
   
-  // Get the temperature from the API response
-  var temperature = forecastData.list[0].main.temp;
+//   // Get the current date
+//   var currentDate = new Date();
   
-  // Get the wind speed from the API response
-  var windSpeed = forecastData.list[0].wind.speed;
+//   // Get the temperature from the API response
+//   var temperature = data.list[0].main.temp;
   
-  // Get the humidity from the API response
-  var humidity = forecastData.list[0].main.humidity;
+//   // Get the wind speed from the API response
+//   var windSpeed = data.list[0].wind.speed;
   
-  // Update the HTML with the extracted data
-  $("#current").text(city + " - " + currentDate.toLocaleDateString());
-  $("#tempDay2").text("Temp: " + temperature + "°C");
-  $("#windDay2").text("Wind Speed: " + windSpeed + "m/s");
-  $("#humidityDay2").text("Humidity: " + humidity + "%");
-  displayCurrentCity();
-});
-console.log(windSpeed);
-}
+//   // Get the humidity from the API response
+//   var humidity = data.list[0].main.humidity;
+  
+//   // Update the HTML with the extracted data
+//   $("#current").text(city + " - " + currentDate.toLocaleDateString());
+//   $("#tempDay").text("Temp: " + temperature + "°C");
+//   $("#windDay").text("Wind Speed: " + windSpeed + "m/s");
+//   $("#humidityDay").text("Humidity: " + humidity + "%");
+// });
+
+// console.log(forecastData.list[0].wind.speed);
+// displayCurrentCity();
+// }
+
+
+
 
 
 
@@ -161,7 +202,10 @@ console.log(windSpeed);
 // });
 
 // // clear history
-// $("#clear-button").on("click", clear);
+// document.querySelector("#clear-button").addEventListener("click", function () {
+//   localStorage.clear();
+//   document.querySelector("#history ul").innerHTML = "";
+// });
 
 // declare variable to handle form submit
 // include a prevent default
