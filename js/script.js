@@ -21,7 +21,10 @@ $("#search-button").on("click", function (event) {
   event.preventDefault();
   // Get the city value from the input box
   const city = $("#search-input").val();
+  getCoords(city);
+});
 
+function getCoords(city) {
   // Build the API query URL for geocoding
   const geocodeQueryURL =
     geocodeApiEndpoint + "q=" + city + "&limit=1&appid=" + apiKey;
@@ -32,70 +35,109 @@ $("#search-button").on("click", function (event) {
     type: "GET",
     success: function (geocodeData) {
       // Get the latitude and longitude from the geocodeData
-      const lat = geocodeData[0].lat;
-      const lon = geocodeData[0].lon;
+      // const lat = geocodeData[0].lat;
+      // const lon = geocodeData[0].lon;
+      getWeather(geocodeData[0]);
 
-      console.log("---------------\ngeocodeQueryURL: " + geocodeQueryURL + "\n---------------");
-
-      // Build the API query URL for 5-day forecast
-      const forecastQueryURL =
-        forecastApiEndpoint +
-        "lat=" + lat +
-        "&lon=" + lon +
-        "&units=" + units +
-        "&appid=" + apiKey;
-
-      // Make the AJAX request for 5-day forecast
-      $.ajax({
-        url: forecastQueryURL,
-        type: "GET",
-        success: function (forecastData) {
-          console.log(forecastData);
-          console.log("---------------\nforecastQueryURL: " + forecastQueryURL + "\n---------------");
-        },
-        error: function (error) {
-          console.error("Error getting 5-day forecast: ", error);
-        },
-      });
+      console.log(
+        "---------------\ngeocodeQueryURL: " +
+          geocodeQueryURL +
+          "\n---------------"
+      );
     },
+  });
+}
+
+// Build the API query URL for 5-day forecast
+
+function getWeather(location) {
+  var { lat, lon } = location; // deconstructing object data
+  var city = location.name;
+  console.log(location.name);
+  console.log(city);
+  console.log(lat, lon);
+
+  const forecastQueryURL =
+    forecastApiEndpoint +
+    "lat=" +
+    lat +
+    "&lon=" +
+    lon +
+    "&units=" +
+    units +
+    "&appid=" +
+    apiKey;
+
+  // Make the AJAX request for 5-day forecast
+  $.ajax({
+    url: forecastQueryURL,
+    type: "GET",
+    success: function (data) {
+      console.log(data);
+      console.log(
+        "---------------\nforecastQueryURL: " + forecastQueryURL + "\n---------------"
+      );
+      shareInfo(city, data)
+    },
+    error: function (error) {
+      console.error("Error getting 5-day forecast: ", error);
+    },
+
     error: function (error) {
       console.error("Error getting geocode data: ", error);
     },
   });
-});
+}
 
-/** 
-* @param {object} forecastData - object containing JSON output
-*/
+function shareInfo(city, data) {
+  currentWeather(city, data.list[0]) // create BS card dynamically and textContent the values onto the cards
+  forecastWeather(data.list) // just H2, loop through forecast.length
+}
+// /**
+// * @param {object} forecastData - object containing JSON output
+// */
 
-//declare how mnay days forecast needed
-const forecastLength = 5;
- // Loop through and build elements for the defined number of days
- for (var i = 0; i < forecastLength; i++) {
-  // Get specific forecast info for current index
-  var temp = forecastData.list[i].main.temp;
-  var wind = forecastData.list[i].wind.speed;
-  var icon = forecastData.list[i].weather.icon;
-  var humidity = forecastData.list[i].main.humidity;
+// function renderForecast() {
+// //declare how mnay days forecast needed
+// const forecastLength = 5;
+//  // Loop through and build elements for the defined number of days
+//  for (var i = 0; i < forecastLength; i++) {
+//   // Get specific forecast info for current index
+//   var temp = forecastData.list[i].main.temp;
+//   var wind = forecastData.list[i].wind.speed;
+//   var icon = forecastData.list[i].weather.icon;
+//   var humidity = forecastData.list[i].main.humidity;
 
-  // Increase the forecastDay (track day # - starting at 1)
-  var forecastDay = i + 1;
+// Increase the forecastDay (track day # - starting at 1)
+//   var forecastDay = i + 1;
 
-     // Create the  list group to contain the forecast and add the content for each day
-     var $forecastDetail = $("<ul>");
-     $forecastDetail.addClass("list-group");
- }
+//      // Create the  list group to contain the forecast and add the content for each day
+//      var $forecastDetail = $("<ul>");
+//      $forecastDetail.addClass("list-group");
 
+//      // Add the newly created element to the DOM
+//     $("#history").append($forecastDetail);
+
+//     // appending the variables to the forecastDetail
+//     var $forecastDetails = $("<div class='card', id='day1', style='width: 10rem;>'");
+
+//     $forecastDetails.append("<h5>Temp: " + temp + "</h5>")
+//     $forecastDetails.append("<h5>Humidity: " + humidity + "%</h5>")
+//     $forecastDetails.append("<h5>Wind Speed: " + wind + "m/s</h5>")
+//     $forecastDetails.append("<h5>" + icon + "</h5>")
+
+//  }
+// }
 
 // function splitData(city, list) {
-  
+
 // }
 
 // fetch("https://api.openweathermap.org/data/2.5/forecast?q='+city.value+'lat='+lat+'&lon='+lon+'&units='+units+'&appid=7cecd6cf1a25249cb6676d7e0009bd81")
 // .then(response => response.json())
 // .then(data => {
 //   for (i=0; i<5; i++){
-//     document.getElementById("TempDay" + (i+1) + "temp").innerHTML = 
+//     document.getElementById("TempDay" + (i+1) + "temp").innerHTML =
 //     "Temp:" + Number(data.list[i].main.temp + "°C");
 
 //   }
@@ -110,19 +152,19 @@ const forecastLength = 5;
 // }).then(function(forecastData) {
 //   // Get the city name from the API response
 //   var city = data.city.name;
-  
+
 //   // Get the current date
 //   var currentDate = new Date();
-  
+
 //   // Get the temperature from the API response
 //   var temperature = data.list[0].main.temp;
-  
+
 //   // Get the wind speed from the API response
 //   var windSpeed = data.list[0].wind.speed;
-  
+
 //   // Get the humidity from the API response
 //   var humidity = data.list[0].main.humidity;
-  
+
 //   // Update the HTML with the extracted data
 //   $("#current").text(city + " - " + currentDate.toLocaleDateString());
 //   $("#tempDay").text("Temp: " + temperature + "°C");
@@ -133,11 +175,6 @@ const forecastLength = 5;
 // console.log(forecastData.list[0].wind.speed);
 // displayCurrentCity();
 // }
-
-
-
-
-
 
 //   const apiKey = "&limit=1&appid=7cecd6cf1a25249cb6676d7e0009bd81";
 
@@ -240,6 +277,4 @@ const forecastLength = 5;
 //   nextFunction()
 // }
 
-// function nextFunction() {
-
-// }
+// function nextFunction(){}
