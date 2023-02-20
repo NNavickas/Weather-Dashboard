@@ -333,6 +333,47 @@ function updateSearchHistory(city) {
   }
 }
 
+function getWeather(city) {
+  // Construct the API endpoints for geocoding, current weather, and 5-day forecast
+  var geocodeUrl =
+    geocodeApiEndpoint + "q=" + city + "&limit=1&appid=" + apiKey;
+  var currentWeatherUrl =
+    currentApiEndpoint + "q=" + city + "&units=" + units + "&appid=" + apiKey;
+  var forecastUrl =
+    forecastApiEndpoint + "q=" + city + "&units=" + units + "&appid=" + apiKey;
+
+  // Make an AJAX call to the geocoding API to get the latitude and longitude of the city
+  $.ajax({
+    url: geocodeUrl,
+    method: "GET",
+  }).then(function (data) {
+    // Extract the latitude and longitude from the geocoding API response
+    var lat = data[0].lat;
+    var lon = data[0].lon;
+
+    // Make AJAX calls to the current weather and 5-day forecast APIs using the latitude and longitude
+    $.when(
+      $.ajax({
+        url: currentWeatherUrl + "&lat=" + lat + "&lon=" + lon,
+        method: "GET",
+      }),
+      $.ajax({
+        url: forecastUrl + "&lat=" + lat + "&lon=" + lon,
+        method: "GET",
+      })
+    ).then(function (currentWeatherData, forecastData) {
+      // Display the current weather conditions and 5-day forecast
+      displayCurrentWeather(currentWeatherData[0]);
+      displayForecast(forecastData[0]);
+      console.log(currentWeatherData);
+      console.log(forecastData);
+      // Update the search history
+      updateSearchHistory(city);
+    });
+  });
+  console.log(getWeather);
+}
+
 // Function to display the current weather conditions
 function displayCurrentWeather(data) {
   // Extract the relevant data from the API response
@@ -381,7 +422,8 @@ function displayForecast(data) {
       // Create a div for each day's weather and append it to the forecast div
       var card = $("<div>").addClass("card bg-primary text-white");
       var cardBody = $("<div>").addClass("card-body p-2");
-      card.append(cardBody.append(date, icon, temp, humidity));
+      cardBody.append(date, icon, temp, humidity); // append card body to the card
+      card.append(cardBody); // append card body to the card
       $("#forecast").append(card);
     }
   }
